@@ -1,5 +1,8 @@
 package module4;
 
+import Customs.Helper;
+import Customs.Icon;
+import Customs.Triangle;
 import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.PointFeature;
 import de.fhpotsdam.unfolding.geo.Location;
@@ -16,8 +19,9 @@ public class CityMarker extends SimplePointMarker {
 	
 	// The size of the triangle marker
 	// It's a good idea to use this variable in your draw method
-	public static final int TRI_SIZE = 5;  
-	
+	public static final int TRI_SIZE = 7;  
+	public static final Icon icon = new Triangle(0,Helper.blue,TRI_SIZE);
+
 	public CityMarker(Location location) {
 		super(location);
 	}
@@ -35,18 +39,10 @@ public class CityMarker extends SimplePointMarker {
 	public void draw(PGraphics pg, float x, float y) {
 		// Save previous drawing style
 		pg.pushStyle();
+
 		
-		// TODO: Add code to draw a triangle to represent the CityMarker
-		// HINT: pg is the graphics object on which you call the graphics
-		// methods.  e.g. pg.fill(255, 0, 0) will set the color to red
-		// x and y are the center of the object to draw. 
-		// They will be used to calculate the coordinates to pass
-		// into any shape drawing methods.  
-		// e.g. pg.rect(x, y, 10, 10) will draw a 10x10 square
-		// whose upper left corner is at position x, y
-		// Check out the processing documentation for more methods
-		
-		
+		icon.draw(pg, x, y);
+
 		// Restore previous drawing style
 		pg.popStyle();
 	}

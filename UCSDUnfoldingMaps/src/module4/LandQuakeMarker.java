@@ -1,6 +1,8 @@
 package module4;
 
+import Customs.Circle;
 import de.fhpotsdam.unfolding.data.PointFeature;
+import processing.core.PGraphics;
 import processing.core.PGraphics;
 
 /** Implements a visual marker for land earthquakes on an earthquake map
@@ -12,6 +14,7 @@ import processing.core.PGraphics;
 public class LandQuakeMarker extends EarthquakeMarker {
 	
 	
+	
 	public LandQuakeMarker(PointFeature quake) {
 		
 		// calling EarthquakeMarker constructor
@@ -19,21 +22,22 @@ public class LandQuakeMarker extends EarthquakeMarker {
 		
 		// setting field in earthquake marker
 		isOnLand = true;
+		setup_icon();
 	}
 
 
-	@Override
-	public void drawEarthquake(PGraphics pg, float x, float y) {
-		// Draw a centered circle for land quakes
-		// DO NOT set the fill color here.  That will be set in the EarthquakeMarker
-		// class to indicate the depth of the earthquake.
-		// Simply draw a centered circle.
+	public void draw(PGraphics pg, float x, float y) 
+	{
 		
-		// HINT: Notice the radius variable in the EarthquakeMarker class
-		// and how it is set in the EarthquakeMarker constructor
-		
-		// TODO: Implement this method
-		
+		icon.draw(pg, x, y);
+		super.ifRecent(pg, x, y);
+				
+	}
+	
+	private void setup_icon()
+	{
+		int fillColor = super.determineFill();
+		icon = new Circle(0, fillColor, radius+2);
 	}
 	
 

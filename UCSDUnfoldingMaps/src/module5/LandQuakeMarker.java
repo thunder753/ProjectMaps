@@ -1,7 +1,7 @@
 package module5;
 
+import Customs.Circle;
 import de.fhpotsdam.unfolding.data.PointFeature;
-import processing.core.PGraphics;
 
 /** Implements a visual marker for land earthquakes on an earthquake map
  * 
@@ -19,15 +19,15 @@ public class LandQuakeMarker extends EarthquakeMarker {
 		
 		// setting field in earthquake marker
 		isOnLand = true;
+		setup_icon();
+	}
+	
+	private void setup_icon()
+	{
+		int fillColor = super.determineFill();
+		icon = new Circle(0, fillColor, radius*1.5f);
 	}
 
-
-	/** Draw the earthquake as an ellipse */
-	@Override
-	public void drawEarthquake(PGraphics pg, float x, float y) {
-		pg.ellipse(x, y, 2*radius, 2*radius);
-		
-	}
 	
 
 	// Get the country the earthquake is in

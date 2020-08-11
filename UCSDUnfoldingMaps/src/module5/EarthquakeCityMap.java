@@ -2,6 +2,7 @@ package module5;
 
 import java.util.ArrayList;
 import java.util.List;
+import Customs.*;
 
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.data.Feature;
@@ -35,7 +36,7 @@ public class EarthquakeCityMap extends PApplet {
 	private static final long serialVersionUID = 1L;
 
 	// IF YOU ARE WORKING OFFILINE, change the value of this variable to true
-	private static final boolean offline = false;
+	private static final boolean offline = true;
 	
 	/** This is where to find the local tiles, for working without an Internet connection */
 	public static String mbTilesString = "blankLight-1-3.mbtiles";
@@ -50,6 +51,12 @@ public class EarthquakeCityMap extends PApplet {
 	// The map
 	private UnfoldingMap map;
 	
+	// The legend
+	Legend thisLG;
+	
+	//Buttons
+	List<Button> buttons;
+	
 	// Markers for each city
 	private List<Marker> cityMarkers;
 	// Markers for each earthquake
@@ -63,22 +70,80 @@ public class EarthquakeCityMap extends PApplet {
 	private CommonMarker lastClicked;
 	
 	public void setup() {		
-		// (1) Initializing canvas and map tiles
-		size(900, 700, OPENGL);
+		// Initializing canvas
+		size(1600, 900, OPENGL);
+		
+		//	Setup Maps
+		setup_map(250, 50, 1000, 600);
+		setup_legend();
+		makeButton();
+		
+		//	Reading in earthquake data and geometric properties
+		loadData();
+	   
+
+	    // could be used for debugging
+	    // printQuakes();
+	 		
+	    // Add markers to map
+	    map.addMarkers(quakeMarkers);
+	    map.addMarkers(cityMarkers);
+	    
+	    textFont(createFont("TrebuchetMS",15));
+	} 
+	
+	public void draw() {
+		background(0);
+		map.draw();
+		thisLG.draw();
+		for (Button thisBB : buttons)
+		{
+			thisBB.draw();
+		}
+		
+	}
+	
+	private void setup_map(float x, float y, float size_x, float size_y)
+	{
+		/*
+		 * Initialize maps
+		 */
 		if (offline) {
-		    map = new UnfoldingMap(this, 200, 50, 650, 600, new MBTilesMapProvider(mbTilesString));
+		    map = new UnfoldingMap(this, x, y, size_x, size_y, new MBTilesMapProvider(mbTilesString));
 		    earthquakesURL = "2.5_week.atom";  // The same feed, but saved August 7, 2015
 		}
 		else {
-			map = new UnfoldingMap(this, 200, 50, 650, 600, new Google.GoogleMapProvider());
+			map = new UnfoldingMap(this, x, y, size_x, size_y, new Google.GoogleMapProvider());
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
 		    //earthquakesURL = "2.5_week.atom";
 		}
 		MapUtils.createDefaultEventDispatcher(this, map);
+	}
+	
+	private void setup_legend()
+	{
+		thisLG= new Legend(this.g,"Earthquake Key" , 25, 50, 200, 400, color(255, 250, 240));
 		
+		thisLG.put(new Label(CityMarker.icon, "City"));
 		
-		// (2) Reading in earthquake data and geometric properties
-	    //     STEP 1: load country features and markers
+		thisLG.put(new Label( new Circle(0, color(255, 255, 255),15),"Land Quake" ));
+		thisLG.put(new Label( new Square(0, color(255, 255, 255),15),"Ocean Quake" ));
+		
+		thisLG.put(new Label( null,"Size ~ Magnitude" ));
+		
+		thisLG.put(new Label( new Circle(0, Helper.red,10),"Deep " ));
+		thisLG.put(new Label(new Circle(0, Helper.yellow,10),  "Intermediate"));
+		thisLG.put(new Label(new Circle(0,Helper.green, 10), "Shallow"));
+		
+		thisLG.put(new Label( null ,null ));
+		
+		thisLG.put(new Label(new Xmark(10), "Recent"));
+		
+	}
+	
+	private void loadData()
+	{
+		 //     STEP 1: load country features and markers
 		List<Feature> countries = GeoJSONReader.loadData(this, countryFile);
 		countryMarkers = MapUtils.createSimpleMarkers(countries);
 		
@@ -103,25 +168,15 @@ public class EarthquakeCityMap extends PApplet {
 		    quakeMarkers.add(new OceanQuakeMarker(feature));
 		  }
 	    }
-
-	    // could be used for debugging
-	    printQuakes();
-	 		
-	    // (3) Add markers to map
-	    //     NOTE: Country markers are not added to the map.  They are used
-	    //           for their geometric properties
-	    map.addMarkers(quakeMarkers);
-	    map.addMarkers(cityMarkers);
-	    
-	}  // End setup
-	
-	
-	public void draw() {
-		background(0);
-		map.draw();
-		addKey();
-		
 	}
+	
+	public void makeButton()
+	{
+		buttons = new ArrayList<Button>();
+		buttons.add(new Button(this.g, 200, 100));
+	}
+	
+	
 	
 	/** Event handler that gets called automatically when the 
 	 * mouse moves.
@@ -135,17 +190,29 @@ public class EarthquakeCityMap extends PApplet {
 			lastSelected = null;
 		
 		}
-		selectMarkerIfHover(quakeMarkers);
-		selectMarkerIfHover(cityMarkers);
+		selectMarkerIfHover(quakeMarkers,cityMarkers);
 	}
 	
 	// If there is a marker under the cursor, and lastSelected is null 
 	// set the lastSelected to be the first marker found under the cursor
 	// Make sure you do not select two markers.
 	// 
-	private void selectMarkerIfHover(List<Marker> markers)
+	private void selectMarkerIfHover(List<Marker> Omarkers, List<Marker> Lmarkers)
 	{
-		// TODO: Implement this method
+		List<Marker> merged = Omarkers;
+		merged.addAll(Lmarkers);
+		
+		for(Marker m : merged)
+		{
+			CommonMarker cm = (CommonMarker)m;
+			if(cm.isInside(map, mouseX, mouseY))
+			{
+				lastSelected = cm;
+				lastSelected.setSelected(true);
+				break;
+			}
+			
+		}
 	}
 	
 	/** The event handler for mouse clicks
@@ -159,6 +226,13 @@ public class EarthquakeCityMap extends PApplet {
 		// TODO: Implement this method
 		// Hint: You probably want a helper method or two to keep this code
 		// from getting too long/disorganized
+		
+		if (lastClicked != null) 
+		{
+			lastClicked.setClicked(false);
+			lastClicked = null;
+		
+		}
 	}
 	
 	
@@ -173,68 +247,7 @@ public class EarthquakeCityMap extends PApplet {
 		}
 	}
 	
-	// helper method to draw key in GUI
-	private void addKey() {	
-		// Remember you can use Processing's graphics methods here
-		fill(255, 250, 240);
-		
-		int xbase = 25;
-		int ybase = 50;
-		
-		rect(xbase, ybase, 150, 250);
-		
-		fill(0);
-		textAlign(LEFT, CENTER);
-		textSize(12);
-		text("Earthquake Key", xbase+25, ybase+25);
-		
-		fill(150, 30, 30);
-		int tri_xbase = xbase + 35;
-		int tri_ybase = ybase + 50;
-		triangle(tri_xbase, tri_ybase-CityMarker.TRI_SIZE, tri_xbase-CityMarker.TRI_SIZE, 
-				tri_ybase+CityMarker.TRI_SIZE, tri_xbase+CityMarker.TRI_SIZE, 
-				tri_ybase+CityMarker.TRI_SIZE);
 
-		fill(0, 0, 0);
-		textAlign(LEFT, CENTER);
-		text("City Marker", tri_xbase + 15, tri_ybase);
-		
-		text("Land Quake", xbase+50, ybase+70);
-		text("Ocean Quake", xbase+50, ybase+90);
-		text("Size ~ Magnitude", xbase+25, ybase+110);
-		
-		fill(255, 255, 255);
-		ellipse(xbase+35, 
-				ybase+70, 
-				10, 
-				10);
-		rect(xbase+35-5, ybase+90-5, 10, 10);
-		
-		fill(color(255, 255, 0));
-		ellipse(xbase+35, ybase+140, 12, 12);
-		fill(color(0, 0, 255));
-		ellipse(xbase+35, ybase+160, 12, 12);
-		fill(color(255, 0, 0));
-		ellipse(xbase+35, ybase+180, 12, 12);
-		
-		textAlign(LEFT, CENTER);
-		fill(0, 0, 0);
-		text("Shallow", xbase+50, ybase+140);
-		text("Intermediate", xbase+50, ybase+160);
-		text("Deep", xbase+50, ybase+180);
-
-		text("Past hour", xbase+50, ybase+200);
-		
-		fill(255, 255, 255);
-		int centerx = xbase+35;
-		int centery = ybase+200;
-		ellipse(centerx, centery, 12, 12);
-
-		strokeWeight(2);
-		line(centerx-8, centery-8, centerx+8, centery+8);
-		line(centerx-8, centery+8, centerx+8, centery-8);
-			
-	}
 
 	
 	

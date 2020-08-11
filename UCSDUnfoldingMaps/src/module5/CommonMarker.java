@@ -1,7 +1,9 @@
 package module5;
 
+import Customs.Helper;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
+import processing.core.PConstants;
 import processing.core.PGraphics;
 
 /** Implements a common marker for cities and earthquakes on an earthquake map
@@ -39,13 +41,31 @@ public abstract class CommonMarker extends SimplePointMarker {
 	// implemented in subclasses
 	public void draw(PGraphics pg, float x, float y) {
 		// For starter code just drawMaker(...)
+		pg.pushStyle();
 		if (!hidden) {
 			drawMarker(pg, x, y);
-			if (selected) {
+			if (selected) 
+			{
 				showTitle(pg, x, y);  // You will implement this in the subclasses
 			}
 		}
+		pg.popStyle();
 	}
 	public abstract void drawMarker(PGraphics pg, float x, float y);
 	public abstract void showTitle(PGraphics pg, float x, float y);
+	
+	public void titleHelper (PGraphics pg, float x, float y, String info)
+	{
+		pg.pushStyle();
+		pg.stroke(0);
+		pg.fill(Helper.white);
+		pg.rect(x, y, 300, 20);
+		
+		pg.fill(0);
+		pg.textAlign(PConstants.LEFT, PConstants.CENTER);
+		pg.text(info, x + 10, y+5);
+		
+		pg.pushStyle();
+	}
+	
 }

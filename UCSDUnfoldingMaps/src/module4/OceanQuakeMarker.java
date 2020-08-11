@@ -1,5 +1,6 @@
 package module4;
 
+import Customs.Square;
 import de.fhpotsdam.unfolding.data.PointFeature;
 import processing.core.PGraphics;
 
@@ -16,21 +17,22 @@ public class OceanQuakeMarker extends EarthquakeMarker {
 		
 		// setting field in earthquake marker
 		isOnLand = false;
+		setup_icon();
 	}
 	
 
-	@Override
-	public void drawEarthquake(PGraphics pg, float x, float y) {
-		// Drawing a centered square for Ocean earthquakes
-		// DO NOT set the fill color.  That will be set in the EarthquakeMarker
-		// class to indicate the depth of the earthquake.
-		// Simply draw a centered square.
+	public void draw(PGraphics pg, float x, float y) 
+	{
 		
-		// HINT: Notice the radius variable in the EarthquakeMarker class
-		// and how it is set in the EarthquakeMarker constructor
-		
-		// TODO: Implement this method
-		
+		icon.draw(pg, x, y);
+		super.ifRecent(pg, x, y);
+				
+	}
+	
+	private void setup_icon()
+	{
+		int fillColor = super.determineFill();
+		icon = new Square(0, fillColor, radius*2);
 	}
 	
 
