@@ -80,6 +80,7 @@ public class EarthquakeCityMap extends PApplet {
 		
 		//	Reading in earthquake data and geometric properties
 		loadData();
+		System.out.println("Debug point");
 	   
 
 	    // could be used for debugging
@@ -197,10 +198,11 @@ public class EarthquakeCityMap extends PApplet {
 	// set the lastSelected to be the first marker found under the cursor
 	// Make sure you do not select two markers.
 	// 
-	private void selectMarkerIfHover(List<Marker> Omarkers, List<Marker> Lmarkers)
+	private void selectMarkerIfHover(List<Marker> Qmarkers, List<Marker> Cmarkers)
 	{
-		List<Marker> merged = Omarkers;
-		merged.addAll(Lmarkers);
+		List<Marker> merged = new ArrayList<Marker>();
+		merged.addAll(Qmarkers);
+		merged.addAll(Cmarkers);
 		
 		for(Marker m : merged)
 		{
@@ -223,15 +225,20 @@ public class EarthquakeCityMap extends PApplet {
 	@Override
 	public void mouseClicked()
 	{
-		// TODO: Implement this method
-		// Hint: You probably want a helper method or two to keep this code
-		// from getting too long/disorganized
-		
 		if (lastClicked != null) 
 		{
 			lastClicked.setClicked(false);
 			lastClicked = null;
+		}
 		
+		lastClicked = lastSelected;
+		
+		if (!(lastClicked == null || lastSelected.isHidden()))
+		{
+			lastClicked.setClicked(true);
+			showOnlyRelvent();
+		}else {
+			unhideMarkers();
 		}
 	}
 	
@@ -245,6 +252,41 @@ public class EarthquakeCityMap extends PApplet {
 		for(Marker marker : cityMarkers) {
 			marker.setHidden(false);
 		}
+	}
+	
+	private void showOnlyRelvent()
+	{
+		if(lastClicked instanceof EarthquakeMarker)
+		{		
+			for(Marker marker : quakeMarkers) 
+			{
+				if(marker != lastClicked) marker.setHidden(true);
+			}
+			
+			for(Marker marker : cityMarkers) 
+			{
+				// if the city 'marker' is within the selected earthquake's impact radius
+				if(marker.getDistanceTo(lastClicked.getLocation()) > ((EarthquakeMarker)lastClicked).threatCircle()) marker.setHidden(true);
+			}
+			
+		}
+		
+		else 
+		{
+			for(Marker marker : cityMarkers) 
+			{
+				if(marker != lastClicked) marker.setHidden(true);
+			}
+			
+			for(Marker marker : quakeMarkers) 
+			{
+				// if this earthquake 'marker' is within its impact radius of selected city
+				if (marker.getDistanceTo(lastClicked.getLocation()) > ((EarthquakeMarker) marker).threatCircle()) marker.setHidden(true);
+			}
+			
+
+		}
+		
 	}
 	
 

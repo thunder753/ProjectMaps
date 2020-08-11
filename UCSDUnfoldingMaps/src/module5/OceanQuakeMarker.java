@@ -6,7 +6,7 @@ import de.fhpotsdam.unfolding.data.PointFeature;
 /** Implements a visual marker for ocean earthquakes on an earthquake map
  * 
  * @author UC San Diego Intermediate Software Development MOOC team
- * @author Your name here
+ * @author Divas Subedi
  *
  */
 public class OceanQuakeMarker extends EarthquakeMarker {

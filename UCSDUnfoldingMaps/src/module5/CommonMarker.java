@@ -46,7 +46,7 @@ public abstract class CommonMarker extends SimplePointMarker {
 			drawMarker(pg, x, y);
 			if (selected) 
 			{
-				showTitle(pg, x, y);  // You will implement this in the subclasses
+				showTitle(pg, x, y);
 			}
 		}
 		pg.popStyle();
