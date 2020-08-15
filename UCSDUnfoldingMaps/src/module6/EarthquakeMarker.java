@@ -1,16 +1,18 @@
 package module6;
 
+import Customs.Helper;
+import Customs.Icon;
+import Customs.Xmark;
 import de.fhpotsdam.unfolding.data.PointFeature;
-import processing.core.PConstants;
 import processing.core.PGraphics;
 
 /** Implements a visual marker for earthquakes on an earthquake map
  * 
  * @author UC San Diego Intermediate Software Development MOOC team
+ * @author Divas Subedi
  *
  */
-// TODO: Implement the comparable interface
-public abstract class EarthquakeMarker extends CommonMarker
+public abstract class EarthquakeMarker extends CommonMarker implements Comparable<EarthquakeMarker>
 {
 	
 	// Did the earthquake occur on land?  This will be set by the subclasses.
@@ -36,12 +38,9 @@ public abstract class EarthquakeMarker extends CommonMarker
 	/** Greater than or equal to this threshold is a deep depth */
 	public static final float THRESHOLD_DEEP = 300;
 
-	// ADD constants for colors
-
-	
-	// abstract method implemented in derived classes
-	public abstract void drawEarthquake(PGraphics pg, float x, float y);
 		
+	public Icon icon;
+	public static final Icon xMark = new Xmark(10);
 	
 	// constructor
 	public EarthquakeMarker (PointFeature feature) 
@@ -55,36 +54,21 @@ public abstract class EarthquakeMarker extends CommonMarker
 		this.radius = 1.75f*getMagnitude();
 	}
 	
-	// TODO: Add the method:
-	// public int compareTo(EarthquakeMarker marker)
-	
-	
+
 	// calls abstract method drawEarthquake and then checks age and draws X if needed
 	@Override
 	public void drawMarker(PGraphics pg, float x, float y) {
 		// save previous styling
 		pg.pushStyle();
 			
-		// determine color of marker from depth
-		colorDetermine(pg);
 		
-		// call abstract method implemented in child class to draw marker shape
-		drawEarthquake(pg, x, y);
+		icon.draw(pg, x, y);
 		
 		// IMPLEMENT: add X over marker if within past day		
 		String age = getStringProperty("age");
 		if ("Past Hour".equals(age) || "Past Day".equals(age)) {
 			
-			pg.strokeWeight(2);
-			int buffer = 2;
-			pg.line(x-(radius+buffer), 
-					y-(radius+buffer), 
-					x+radius+buffer, 
-					y+radius+buffer);
-			pg.line(x-(radius+buffer), 
-					y+(radius+buffer), 
-					x+radius+buffer, 
-					y-(radius+buffer));
+			xMark.draw(pg, x, y);
 			
 		}
 		
@@ -94,24 +78,11 @@ public abstract class EarthquakeMarker extends CommonMarker
 	}
 
 	/** Show the title of the earthquake if this marker is selected */
+	@Override
 	public void showTitle(PGraphics pg, float x, float y)
 	{
-		String title = getTitle();
-		pg.pushStyle();
-		
-		pg.rectMode(PConstants.CORNER);
-		
-		pg.stroke(110);
-		pg.fill(255,255,255);
-		pg.rect(x, y + 15, pg.textWidth(title) +6, 18, 5);
-		
-		pg.textAlign(PConstants.LEFT, PConstants.TOP);
-		pg.fill(0);
-		pg.text(title, x + 3 , y +18);
-		
-		
-		pg.popStyle();
-		
+		String info = getTitle();
+		super.titleHelper(pg, x, y, info);
 	}
 
 	
@@ -128,31 +99,22 @@ public abstract class EarthquakeMarker extends CommonMarker
 		return km;
 	}
 	
-	// determine color of marker from depth
-	// We use: Deep = red, intermediate = blue, shallow = yellow
-	private void colorDetermine(PGraphics pg) {
+	int determineFill()
+	{
 		float depth = getDepth();
-		
-		if (depth < THRESHOLD_INTERMEDIATE) {
-			pg.fill(255, 255, 0);
+		if(depth > THRESHOLD_DEEP) {
+			color = Helper.red;
 		}
-		else if (depth < THRESHOLD_DEEP) {
-			pg.fill(0, 0, 255);
+		else if(depth > THRESHOLD_INTERMEDIATE) {
+			color = Helper.yellow;
 		}
 		else {
-			pg.fill(255, 0, 0);
+			color = Helper.green;
 		}
+		return color;
 	}
 	
 	
-	/** toString
-	 * Returns an earthquake marker's string representation
-	 * @return the string representation of an earthquake marker.
-	 */
-	public String toString()
-	{
-		return getTitle();
-	}
 	/*
 	 * getters for earthquake properties
 	 */
@@ -179,6 +141,17 @@ public abstract class EarthquakeMarker extends CommonMarker
 		return isOnLand;
 	}
 	
+	@Override
+	public int compareTo(EarthquakeMarker other) {
+		Float mag =getMagnitude(); 
+		return mag.compareTo(other.getMagnitude());
+	}
+	
+	public String toString()
+	{
+		return getTitle();
+	}
+
 
 	
 	

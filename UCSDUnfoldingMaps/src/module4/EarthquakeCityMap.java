@@ -76,7 +76,7 @@ public class EarthquakeCityMap extends PApplet {
 //		earthquakesURL = "test2.atom";
 //		
 //		// WHEN TAKING THIS QUIZ: Uncomment the next line
-		earthquakesURL = "quiz1.atom";
+//		earthquakesURL = "quiz1.atom";
 //		
 		
 		
@@ -84,14 +84,11 @@ public class EarthquakeCityMap extends PApplet {
 		loadEarthquakeData();
 	    printQuakes();
 //		
-////	    // Add markers to map
+//	    // Add markers to map
 	    map.addMarkers(quakeMarkers);
 	    map.addMarkers(cityMarkers);
 		
-	    int a = 255, b = 150, c = 150;
-	    
-		System.out.println(color(a,b,c));
-		System.out.println(Helper.color(a, b, c));
+
 	}  // End setup
 	
 	public void draw() {
