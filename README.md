@@ -1,5 +1,4 @@
-# Course1StarterCode
+# ProjectMaps
+This is a project done for for the UCSD Coursera MOOC Object Oriented Programming in Java: https://www.coursera.org/learn/object-oriented-java.  
 
-This is the starter code for the UCSD Coursera MOOC Object Oriented Programming in Java: https://www.coursera.org/learn/object-oriented-java.  
-
-It is an eclipse project that can be imported as an existing project.  Please see the README provided within the eclipse project for more information.
+The project makes use of various data types and event handling to create interactive maps.
